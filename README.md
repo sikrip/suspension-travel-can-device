@@ -8,4 +8,4 @@ Coded based on info found under this repo https://github.com/aollin/racechrono-b
 This is experimental, use it with caution and at your own risk!
 
 ## License
-This = is [licensed](LICENSE) under the [MIT Licence](http://en.wikipedia.org/wiki/MIT_License).
+This is [licensed](LICENSE) under the [MIT Licence](http://en.wikipedia.org/wiki/MIT_License).
