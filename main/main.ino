@@ -1,16 +1,22 @@
 #include <bluefruit.h>
 
-#define DEVICE_NAME "RC ST BLE"
+#define DEVICE_NAME "FR_S_11"
 #define DATA_REPORT_INTERVAL_MS 100
 #define SUSPENSION_TRAVEL_PID 1
 
+#define SENSOR_RIDE_HEIGHT 345
+#define SENSOR_DROOP 294
+
+// Since we cannot report negative values in BLE, droop is defined as 0.
+// Mapping is done using droop and ride height points since it is easier to get
+// these measurements. All values in mm.
+#define RIDE_HEIGHT_TRAVEL 33
+#define DROOP_TRAVEL 0
 #define MIN_TRAVEL 0
 #define MAX_TRAVEL 100
 
-#define FRONT_LEFT_CAN_IDX 0
-#define FRONT_LEFT_SENSOR_PIN A0
-#define FRONT_LEFT_SENSOR_BUMP 345
-#define FRONT_LEFT_SENSOR_DROOP 635
+#define CAN_IDX 0
+#define SENSOR_PIN A0
 
 #define HAS_DEBUG
 
@@ -26,8 +32,8 @@ void dummy_debug(...) {
 
 unsigned long time_now = 0;
 uint8_t canData[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-int frontLeftSensorValue;
-int frontLeftSuspensionTravel;
+int sensorValue;
+int suspensionTravel;
 
 // BLEService docs: https://learn.adafruit.com/bluefruit-nrf52-feather-learning-guide/bleservice
 BLEService bleService = BLEService(0x1ff8);
@@ -78,7 +84,7 @@ void startBLEAdvertising() {
 }
 
 void initSensors() {
-  pinMode(FRONT_LEFT_SENSOR_PIN, INPUT); // front left
+  pinMode(SENSOR_PIN, INPUT);
 }
 
 void setup() {
@@ -127,17 +133,17 @@ void reportData() {
  if(millis() >= time_now + DATA_REPORT_INTERVAL_MS){
      time_now += DATA_REPORT_INTERVAL_MS;
 
-     frontLeftSensorValue = analogRead(FRONT_LEFT_SENSOR_PIN);
+     sensorValue = analogRead(SENSOR_PIN);
      // map from potentiometer reading to suspension travel
-     frontLeftSuspensionTravel = min(
+     suspensionTravel = min(
        MAX_TRAVEL,
       max(
         MIN_TRAVEL,
-        map(frontLeftSensorValue, FRONT_LEFT_SENSOR_BUMP, FRONT_LEFT_SENSOR_DROOP, MIN_TRAVEL, MAX_TRAVEL)
+        map(sensorValue, SENSOR_RIDE_HEIGHT, SENSOR_DROOP, RIDE_HEIGHT_TRAVEL, DROOP_TRAVEL)
       )
      );
-     debugln(String(frontLeftSensorValue, DEC) + "->" + String(frontLeftSuspensionTravel, DEC));
-     canData[FRONT_LEFT_CAN_IDX] = frontLeftSuspensionTravel;
+     debugln(String(sensorValue, DEC) + "->" + String(suspensionTravel, DEC));
+     canData[CAN_IDX] = suspensionTravel;
 
      sendData(SUSPENSION_TRAVEL_PID, canData);
    }
