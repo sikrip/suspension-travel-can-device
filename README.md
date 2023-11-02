@@ -7,7 +7,7 @@ Coded based on info found under this repo https://github.com/aollin/racechrono-b
 As of today (07/2023) RaceChono does not support adding more than one DIY BLE Device.
 
 If you need to measure in more than one corners / axles with the potentiometer method consider
-using this version: https://github.com/sikrip/suspension-travel-can-device/tree/RejsaRubberTrac-Potentiometer-MLX90640
+using this version: https://github.com/sikrip/suspension-travel-RejsaRubberTrac
 that is built on top of https://github.com/MagnusThome/RejsaRubberTrac and also uses the later MLX90640 sensor.
 
 ## Safety notice
